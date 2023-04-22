@@ -1,12 +1,13 @@
 import 'package:date_formatter/date_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:todo_list/classes/task.dart';
+import 'package:todo_list/classes/todo.dart';
 
 class TodoListItem extends StatelessWidget {
-  const TodoListItem(this.task, {Key? key}) : super(key: key);
+  const TodoListItem(this.todo, {Key? key, this.onDelete}) : super(key: key);
 
-  final Task task;
+  final Todo todo;
+  final Function(Todo)? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -17,29 +18,35 @@ class TodoListItem extends StatelessWidget {
         child: Slidable(
           startActionPane: ActionPane(
             extentRatio: 0.20,
-            motion: BehindMotion(),
+            motion: const BehindMotion(),
             children: [
               Expanded(
-                child: DecoratedBox(
-                  decoration: const BoxDecoration(color: Colors.red),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        "Apagar",
-                        style: TextStyle(
+                child: Material(
+                  color: Colors.red,
+                  child: InkWell(
+                    splashColor: Colors.red.shade900,
+                    onTap: () {
+                      onDelete!(todo);
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.delete,
                           color: Colors.white,
-                          fontSize: 12,
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          "Apagar",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               )
@@ -66,7 +73,7 @@ class TodoListItem extends StatelessWidget {
                     ),
                     Text(
                       DateFormatter.formatDateTime(
-                        dateTime: task.date,
+                        dateTime: todo.date,
                         outputFormat: "dd/MM/yyyy",
                       ),
                       style: const TextStyle(
@@ -79,7 +86,7 @@ class TodoListItem extends StatelessWidget {
                   height: 5,
                 ),
                 Text(
-                  task.name,
+                  todo.name,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
