@@ -52,12 +52,88 @@ class TodosState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearTodos() {
-    todos.clear();
+  void setFinished(Todo todo, bool finished, BuildContext context) {
+    int todoIndex = todos.indexOf(todo);
+
+    todo.finished = finished;
+
+    todos[todoIndex] = todo;
 
     repository.save(todos);
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("A tarefa '${todo.name}' foi marcada como ${finished ? "finalizada" : "agendada"}."),
+      ),
+    );
+
     notifyListeners();
+  }
+
+  void clearTodos(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Deletar tarefas."),
+        content: Text(
+            "Tem certeza que deseja deletar todas as '${todos.length.toString()}' tarefa(s)?."),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Row(
+                  children: const [
+                    Icon(Icons.close),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text("Cancelar"),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              ElevatedButton(
+                style:
+                ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () {
+                  Navigator.of(context).pop();
+
+                  todos.clear();
+
+                  repository.save(todos);
+
+                  notifyListeners();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Todas as tarefas foram deletadas."),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: const [
+                    Icon(Icons.check),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text("Limpar"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Future<List<Todo>> getTodos() async {
