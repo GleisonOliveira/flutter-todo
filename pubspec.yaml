@@ -41,6 +41,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   omni_datetime_picker: ^1.0.7
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:

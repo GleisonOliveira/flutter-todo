@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:todo_list/classes/date_formatter.dart';
-import 'package:todo_list/classes/todo.dart';
+import 'package:todo_list/models/date_formatter.dart';
+import 'package:todo_list/models/todo.dart';
 
 class TodoListItem extends StatefulWidget {
   const TodoListItem(this.todo, {Key? key, this.onDelete}) : super(key: key);

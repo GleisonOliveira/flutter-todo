@@ -1,12 +1,18 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_list/classes/todo.dart';
+import 'package:todo_list/models/todo.dart';
 
 const TodoListKey = "todo_list";
 
 class TodoRepository {
   late SharedPreferences sharedPreferences;
+
+  TodoRepository() {
+    SharedPreferences.getInstance().then((instance) {
+      sharedPreferences = instance;
+    });
+  }
 
   void save(List<Todo> todos) {
     sharedPreferences.setString(TodoListKey, json.encode(todos));

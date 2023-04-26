@@ -2,188 +2,134 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:todo_list/classes/date_formatter.dart';
-import 'package:todo_list/classes/todo.dart';
-import 'package:todo_list/components/todo_list_item.dart';
-import 'package:todo_list/repositories/todo_repository.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_list/models/todo.dart';
+import 'package:todo_list/models/todo_list_item.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:todo_list/states/todos_state.dart';
 
 const localeName = "pt_BR";
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
+  Widget build(BuildContext context) {
+    TodosState todosState = Provider.of<TodosState>(context);
 
-class _HomePageState extends State<HomePage> {
-  List<Todo> todos = [];
-  final TextEditingController todoInputController = TextEditingController();
-  final TextEditingController todoDateInputController = TextEditingController();
-  final TodoRepository repository = TodoRepository();
-  String todo = "";
-  DateTime date = DateTime.now();
+    void onDelete(Todo todo) {
+      int removalIndex = todosState.todos.indexOf(todo);
 
-  void onDelete(Todo todo) {
-    int removalIndex = todos.indexOf(todo);
+      todosState.deleteTodo(todo);
 
-    todos.remove(todo);
-
-    sortList();
-
-    setState(() {
-      todos = todos;
-    });
-
-    repository.save(todos);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("A tarefa '${todo.name}' foi deletada."),
-        action: SnackBarAction(
-          label: "Desfazer",
-          onPressed: () {
-            setState(() {
-              todos.insert(removalIndex, todo);
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  void clearTodos() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Deletar tarefas."),
-        content: Text(
-            "Tem certeza que deseja deletar todas as '${todos.length.toString()}' tarefa(s)?."),
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Row(
-                  children: const [
-                    Icon(Icons.close),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text("Cancelar"),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    todos.clear();
-                  });
-
-                  repository.save(todos);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Todas as tarefas foram deletada."),
-                    ),
-                  );
-                },
-                child: Row(
-                  children: const [
-                    Icon(Icons.check),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text("Limpar"),
-                  ],
-                ),
-              ),
-            ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("A tarefa '${todo.name}' foi deletada."),
+          action: SnackBarAction(
+            label: "Desfazer",
+            onPressed: () {
+              todosState.insertTodo(todo, removalIndex);
+            },
           ),
-        ],
-      ),
-    );
-  }
-
-  void formatDate() {
-    DateFormatter()
-        .format(
-            locale: localeName,
-            format: "E - dd/MM/yyyy - HH:mm",
-            dateTime: date)
-        .then(
-            (formattedValue) => todoDateInputController.text = formattedValue);
-  }
-
-  void sortList() {
-    todos.sort((a, b) {
-      return a.date.compareTo(b.date);
-    });
-  }
-
-  void addTodo() {
-    todos.add(Todo(todoInputController.text.trim(), date));
-
-    sortList();
-
-    setState(() {
-      todos = todos;
-    });
-
-    todoInputController.text = "";
-    repository.save(todos);
-  }
-
-  Future<void> chooseDate() async {
-    DateTime? pickedDate = await showOmniDateTimePicker(
-      context: context,
-      firstDate: DateTime.now(),
-      initialDate: date,
-      isForce2Digits: true,
-      lastDate: DateTime(DateTime.now().year + 1000),
-      is24HourMode: true,
-    );
-
-    if (pickedDate == null) {
-      return;
+        ),
+      );
     }
 
-    setState(() {
-      date = pickedDate;
-    });
+    void clearTodos() {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Deletar tarefas."),
+          content: Text(
+              "Tem certeza que deseja deletar todas as '${todosState.todos.length.toString()}' tarefa(s)?."),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.close),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text("Cancelar"),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  onPressed: () {
+                    Navigator.of(context).pop();
 
-    formatDate();
-  }
+                    todosState.clearTodos();
 
-  @override
-  void initState() {
-    super.initState();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Todas as tarefas foram deletadas."),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.check),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text("Limpar"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
 
-    formatDate();
+    void addTodo() {
+      todosState.addTodo(Todo(todosState.todoInputController.text.trim(), todosState.date));
+    }
 
-    repository.get().then((value) {
-      setState(() {
-        todos = value;
-      });
-    });
-  }
+    Future<void> chooseDate() async {
+      DateTime? pickedDate = await showOmniDateTimePicker(
+        context: context,
+        firstDate: DateTime.now(),
+        initialDate: todosState.date,
+        isForce2Digits: true,
+        lastDate: DateTime(DateTime.now().year + 1000),
+        is24HourMode: true,
+      );
 
-  @override
-  Widget build(BuildContext context) {
+      if (pickedDate == null) {
+        return;
+      }
+
+      todosState.changeDate(pickedDate);
+    }
+
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {},
+              color: Colors.black,
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
         backgroundColor: Colors.white,
         body: Center(
           child: Padding(
@@ -200,11 +146,9 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: TextField(
-                              controller: todoInputController,
+                              controller: todosState.todoInputController,
                               onChanged: (String text) {
-                                setState(() {
-                                  todo = text;
-                                });
+                                todosState.changeText(text);
                               },
                               style: const TextStyle(fontSize: 14),
                               decoration: const InputDecoration(
@@ -237,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                             flex: 2,
                             child: TextField(
                               readOnly: true,
-                              controller: todoDateInputController,
+                              controller: todosState.todoDateInputController,
                               onTap: chooseDate,
                               style: const TextStyle(fontSize: 14),
                               decoration: const InputDecoration(
@@ -263,10 +207,10 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: todo.isEmpty == true ? null : addTodo,
+                              onPressed: todosState.todo.isEmpty == true ? null : addTodo,
                               style: ElevatedButton.styleFrom(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 19),
+                                const EdgeInsets.symmetric(vertical: 19),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -288,12 +232,11 @@ class _HomePageState extends State<HomePage> {
                       const Divider(),
                       Flexible(
                         fit: FlexFit.tight,
-                        child: SlidableAutoCloseBehavior (
+                        child: SlidableAutoCloseBehavior(
                           child: ListView(
                             shrinkWrap: false,
-                            children: todos
-                                .map((todo) =>
-                                    TodoListItem(todo, onDelete: onDelete))
+                            children: todosState.todos.map((todo) =>
+                                TodoListItem(todo, onDelete: onDelete))
                                 .toList(),
                           ),
                         ),
@@ -303,14 +246,14 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: Text(
-                                "Você possui '${todos.length.toString()}' tarefas pendentes"),
+                                "Você possui '${todosState.todos.length.toString()}' tarefas pendentes"),
                           ),
                           const SizedBox(
                             width: 8,
                           ),
                           ElevatedButton(
                             onPressed:
-                                todos.isEmpty == true ? null : clearTodos,
+                            todosState.todos.isEmpty == true ? null : clearTodos,
                             child: Row(
                               children: const [
                                 Icon(Icons.delete),
@@ -334,3 +277,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
