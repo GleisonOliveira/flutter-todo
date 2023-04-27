@@ -21,24 +21,21 @@ class HomePage extends StatelessWidget {
     ));
 
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
-              child: SlidableAutoCloseBehavior(
-                child: ListView(
-                  shrinkWrap: false,
-                  children: todosState.todos
-                      .map((todo) =>
-                      TodoListItem(todo))
-                      .toList(),
-                ),
+      child: Column(
+        children: [
+          Flexible(
+            fit: FlexFit.tight,
+            child: SlidableAutoCloseBehavior(
+              child: ListView(
+                shrinkWrap: false,
+                children: todosState.todos
+                    .map((todo) =>
+                    TodoListItem(todo))
+                    .toList(),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
