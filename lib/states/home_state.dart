@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:todo_list/models/home.dart';
 import 'package:todo_list/pages/home_page.dart';
+import 'package:todo_list/pages/todo_page.dart';
 
 class HomeState extends ChangeNotifier {
   int page = 0;
   PageController pageController = PageController();
+  late SlidableController slidableController;
+
   final List<Home> pages = [
     Home(page: const HomePage(), appBar: "TODAS AS TAREFAS"),
     Home(page: Container(), appBar: "Configurações",)
@@ -17,5 +22,19 @@ class HomeState extends ChangeNotifier {
         duration: const Duration(milliseconds: 250), curve: Curves.linearToEaseOut);
 
     notifyListeners();
+  }
+
+  void openTaskScreen(BuildContext context, {bool edit = false}) {
+    showBarModalBottomSheet(
+      barrierColor: Colors.black.withAlpha(70),
+      context: context,
+      builder: (context) => SingleChildScrollView(
+        controller: ModalScrollController.of(context),
+        child: TodoPage(edit: edit),
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+      ),
+    );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_list/models/date_formatter.dart';
 import 'package:todo_list/models/todo.dart';
+import 'package:todo_list/states/home_state.dart';
 import 'package:todo_list/states/todos_state.dart';
 
 class TodoListItem extends StatefulWidget {
@@ -55,6 +56,7 @@ class _TodoListItemState extends State<TodoListItem> {
   @override
   Widget build(BuildContext context) {
     TodosState todosState = Provider.of<TodosState>(context);
+    HomeState homeState = Provider.of<HomeState>(context);
 
     return Column(
       children: [
@@ -63,17 +65,18 @@ class _TodoListItemState extends State<TodoListItem> {
           child: Slidable(
             groupTag: "tag",
             closeOnScroll: true,
-            startActionPane: ActionPane(
-              extentRatio: 0.40,
+            endActionPane: ActionPane(
+              extentRatio: 0.30,
               motion: const BehindMotion(),
               children: [
                 Expanded(
                   child: Material(
-                    color: Colors.green,
+                    color: const Color(0xff1dd1a1),
                     child: InkWell(
                       splashColor: Colors.green.shade900,
                       onTap: () {
-                        print("make action");
+                        todosState.changeTodo(widget.todo);
+                        homeState.openTaskScreen(context, edit: true);
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -99,11 +102,11 @@ class _TodoListItemState extends State<TodoListItem> {
                 ),
                 Expanded(
                   child: Material(
-                    color: Colors.red,
+                    color: const Color(0xffff6b6b),
                     child: InkWell(
                       splashColor: Colors.red.shade900,
                       onTap: () {
-                        widget.onDelete!(widget.todo);
+                        todosState.deleteTodo(widget.todo, context);
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -129,81 +132,122 @@ class _TodoListItemState extends State<TodoListItem> {
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              todosState.setFinished(widget.todo, !widget.todo.finished, context);
-                            },
-                            style: TextButton.styleFrom(
-                              fixedSize: const Size(50, 50),
-                              backgroundColor: widget.todo.finished == true ? Colors.green : const Color(0xffebebeb),
-                              shape: const CircleBorder(),
-                            ),
-                            child: Icon(
-                              widget.todo.finished == true
-                                  ? Icons.check
-                                  : Icons.schedule,
-                              color: widget.todo.finished == true
-                                  ? Colors.white
-                                  : Colors.grey.shade800,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.calendar_month,
-                                color: Color(0xff0984e3),
-                                size: 20,
+            child: Material(
+              color: Colors.white,
+              child: InkWell(
+                onTap: (){
+                  todosState.changeTodo(widget.todo);
+                  homeState.openTaskScreen(context, edit: true);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Slidable.of(context)?.dismiss(
+                                  ResizeRequest(const Duration(milliseconds: 300), (){
+
+                                  }),
+                                  duration: const Duration(milliseconds: 300),
+                                );
+
+                                todosState.setFinished(
+                                    widget.todo, !widget.todo.finished, context);
+                              },
+                              style: TextButton.styleFrom(
+                                fixedSize: const Size(30, 30),
+                                backgroundColor: widget.todo.finished == true
+                                    ? const Color(0xff1dd1a1)
+                                    : const Color(0xffebebeb),
+                                shape: const CircleBorder(),
                               ),
-                              const SizedBox(
+                              child: Icon(
+                                widget.todo.finished == true
+                                    ? Icons.check
+                                    : Icons.schedule,
+                                color: widget.todo.finished == true
+                                    ? Colors.white
+                                    : Colors.grey.shade800,
+                                size: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(2.5),
+                                  color: widget.todo.color,
+                                ),
                                 width: 5,
                               ),
-                              Text(
-                                date,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                widget.todo.name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_month,
+                                    color: Color(0xff0984e3),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    date,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      widget.todo.name,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
             ),
           ),

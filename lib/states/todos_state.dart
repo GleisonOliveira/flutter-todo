@@ -8,15 +8,33 @@ const localeName = "pt_BR";
 class TodosState extends ChangeNotifier {
   List<Todo> todos = [];
   final TodoRepository repository = TodoRepository();
-  String todo = "";
+  String name = "";
   DateTime date = DateTime.now();
+  Color color = Colors.blue;
+  bool finished = false;
   TextEditingController todoInputController = TextEditingController();
   TextEditingController todoDateInputController = TextEditingController();
+  TextEditingController todoHourInputController = TextEditingController();
+  Todo? todo;
+  int todoIndex = 0;
 
   TodosState() {
     formatDate();
-
+    formatHour();
     getTodos();
+  }
+
+  void resetTodo() {
+    todoInputController.text = "";
+    name = "";
+    color = Colors.blue;
+    DateTime now = DateTime.now();
+    date = DateTime(now.year, now.month, now.day, 0, 0);
+
+    formatDate();
+    formatHour();
+
+    todo = null;
   }
 
   void sortList() {
@@ -25,14 +43,30 @@ class TodosState extends ChangeNotifier {
     });
   }
 
-  void addTodo(Todo todo) {
-    todos.add(todo);
+  void addTodo() {
+    todos.add(Todo(todoInputController.text.trim(), date,
+        color: color, finished: finished));
     sortList();
 
     repository.save(todos);
 
-    todoInputController.text = "";
-    this.todo = "";
+    resetTodo();
+
+    notifyListeners();
+  }
+
+  void updateTodo() {
+    Todo todo = todos[todoIndex];
+    todo.color = color;
+    todo.date = date;
+    todo.finished = finished;
+    todo.name = name;
+
+    sortList();
+
+    repository.save(todos);
+
+    resetTodo();
 
     notifyListeners();
   }
@@ -43,11 +77,25 @@ class TodosState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteTodo(Todo todo) {
+  void deleteTodo(Todo todo, BuildContext context) {
+    int removalIndex = todos.indexOf(todo);
+
     todos.remove(todo);
     sortList();
 
     repository.save(todos);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("A tarefa '${todo.name}' foi deletada."),
+        action: SnackBarAction(
+          label: "Desfazer",
+          onPressed: () {
+            insertTodo(todo, removalIndex);
+          },
+        ),
+      ),
+    );
 
     notifyListeners();
   }
@@ -63,7 +111,8 @@ class TodosState extends ChangeNotifier {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("A tarefa '${todo.name}' foi marcada como ${finished ? "finalizada" : "agendada"}."),
+        content: Text(
+            "A tarefa '${todo.name}' foi marcada como ${finished ? "finalizada" : "agendada"}."),
       ),
     );
 
@@ -102,8 +151,7 @@ class TodosState extends ChangeNotifier {
                 width: 5,
               ),
               ElevatedButton(
-                style:
-                ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                 onPressed: () {
                   Navigator.of(context).pop();
 
@@ -148,22 +196,55 @@ class TodosState extends ChangeNotifier {
     this.date = date;
 
     formatDate();
+    formatHour();
 
     notifyListeners();
   }
 
   void formatDate() {
     DateFormatter()
-        .format(
-            locale: localeName,
-            format: "E - dd/MM/yyyy - HH:mm",
-            dateTime: date)
+        .format(locale: localeName, format: "E - dd/MM/yyyy", dateTime: date)
         .then(
             (formattedValue) => todoDateInputController.text = formattedValue);
   }
 
+  void formatHour() {
+    DateFormatter()
+        .format(locale: localeName, format: "HH:mm", dateTime: date)
+        .then(
+            (formattedValue) => todoHourInputController.text = formattedValue);
+  }
+
   void changeText(String text) {
-    todo = text;
+    name = text;
+
+    notifyListeners();
+  }
+
+  void changeColor(Color color) {
+    this.color = color;
+
+    notifyListeners();
+  }
+
+  void changeFinished(bool finished) {
+    this.finished = finished;
+
+    notifyListeners();
+  }
+
+  void changeTodo(Todo todo) {
+    this.todo = todo;
+    name = todo.name;
+    color = todo.color;
+    finished = todo.finished;
+    date = todo.date;
+
+    formatHour();
+    formatDate();
+    todoInputController.text = todo.name;
+
+    todoIndex = todos.indexOf(todo);
 
     notifyListeners();
   }

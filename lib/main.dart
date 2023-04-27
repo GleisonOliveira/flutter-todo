@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list/models/todo.dart';
-import 'package:todo_list/pages/home_page.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_list/states/home_state.dart';
@@ -13,7 +12,8 @@ void main() {
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
-  List<Widget> getActions(int pageIndex, BuildContext context, TodosState todosState) {
+  List<Widget> getActions(
+      int pageIndex, BuildContext context, TodosState todosState) {
     if (pageIndex == 1) {
       return [];
     }
@@ -25,9 +25,9 @@ class App extends StatelessWidget {
           onPressed: () {
             todosState.clearTodos(context);
           },
-          icon: const Icon(
+          icon: Icon(
             Icons.delete_forever,
-            color: Colors.black,
+            color: Colors.grey.shade700,
           )));
     }
     return actions;
@@ -75,29 +75,30 @@ class App extends StatelessWidget {
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerDocked,
                 floatingActionButton: FloatingActionButton(
+                  onPressed: () {
+                    homeState.openTaskScreen(context);
+                  },
                   child: const Icon(Icons.add),
-                  onPressed: () {},
                 ),
                 appBar: AppBar(
                   title: Text(
-                    homeState.pages[homeState.page]!.appBar.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.black,
+                    homeState.pages[homeState.page].appBar.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
                     ),
                   ),
-                  leadingWidth: 50,
                   leading: Builder(
                     builder: (context) => IconButton(
                       onPressed: () {
                         homeState.setPage(0);
                       },
-                      icon: const Icon(Icons.home_outlined),
-                      color: Colors.black,
+                      icon: const Icon(Icons.home),
+                      color: Colors.grey.shade600,
                     ),
                   ),
-                  elevation: 0,
+                  elevation: 2,
                   backgroundColor: Colors.white,
                   actions: getActions(homeState.page, context, todosState),
                 ),
