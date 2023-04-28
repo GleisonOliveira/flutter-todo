@@ -1,7 +1,7 @@
+import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_list/models/todo.dart';
 import 'package:todo_list/states/todos_state.dart';
 
 const List<Color> colors = [
@@ -55,10 +55,10 @@ class TodoPage extends StatelessWidget {
     void manageTodo() {
       FocusManager.instance.primaryFocus?.unfocus();
 
-      if(edit) {
+      if (edit) {
         todosState.updateTodo();
         Navigator.of(context).pop();
-        
+
         return;
       }
 
@@ -71,7 +71,7 @@ class TodoPage extends StatelessWidget {
       DateTime? pickedDate = await showDatePicker(
         initialEntryMode: DatePickerEntryMode.calendarOnly,
         context: context,
-        firstDate: DateTime.now(),
+        firstDate: DateTime(DateTime.now().year - 100),
         initialDate: todosState.date,
         lastDate: DateTime(DateTime.now().year + 1000),
       );
@@ -84,24 +84,26 @@ class TodoPage extends StatelessWidget {
     }
 
     Future<void> chooseHour() async {
-      TimeOfDay? pickedHour = await showTimePicker(
-        initialEntryMode: TimePickerEntryMode.dialOnly,
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+      Navigator.of(context).push(
+        showPicker(
+          borderRadius: 5,
+          context: context,
+          is24HrFormat: true,
+          cancelText: "CANCELAR",
+          okText: "OK",
+          value: Time(hour: DateTime.now().hour, minute: DateTime.now().minute),
+          onChange: (time) {
+            DateTime selectedDay = DateTime(
+                todosState.date.year,
+                todosState.date.month,
+                todosState.date.day,
+                time.hour,
+                time.minute);
+
+            todosState.changeDate(selectedDay);
+          },
+        ),
       );
-
-      if (pickedHour == null) {
-        return;
-      }
-
-      DateTime selectedDay = DateTime(
-          todosState.date.year,
-          todosState.date.month,
-          todosState.date.day,
-          pickedHour.hour,
-          pickedHour.minute);
-
-      todosState.changeDate(selectedDay);
     }
 
     return Padding(

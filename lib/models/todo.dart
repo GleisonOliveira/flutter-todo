@@ -6,7 +6,7 @@ class Todo {
   Todo.fromJson(Map<String, dynamic> todo)
       : name = todo['name'],
         date = DateTime.parse(todo['date']),
-        color = Color(todo['color']),
+        color = Color(todo['color'] ?? Colors.blue.value),
         finished = todo['finished'];
 
   String name;

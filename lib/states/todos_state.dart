@@ -132,7 +132,7 @@ class TodosState extends ChangeNotifier {
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: const Color(0xffff6b6b),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -151,7 +151,9 @@ class TodosState extends ChangeNotifier {
                 width: 5,
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff1dd1a1),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop();
 

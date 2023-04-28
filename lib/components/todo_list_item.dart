@@ -252,10 +252,6 @@ class _TodoListItemState extends State<TodoListItem> {
             ),
           ),
         ),
-        const Divider(
-          thickness: 1,
-          height: 5,
-        )
       ],
     );
   }

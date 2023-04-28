@@ -44,6 +44,9 @@ dependencies:
   provider: ^6.0.5
   modal_bottom_sheet: ^3.0.0-pre
   flutter_colorpicker: ^1.0.3
+  grouped_list: ^5.1.2
+  jiffy: ^5.0.0
+  day_night_time_picker: ^1.2.0+2
 
 dev_dependencies:
   flutter_test:

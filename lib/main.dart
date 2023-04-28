@@ -14,7 +14,7 @@ class App extends StatelessWidget {
 
   List<Widget> getActions(
       int pageIndex, BuildContext context, TodosState todosState) {
-    if (pageIndex == 1) {
+    if (pageIndex == 0 || pageIndex == 2) {
       return [];
     }
 
@@ -35,6 +35,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<TodosState>(
@@ -47,6 +53,7 @@ class App extends StatelessWidget {
       child:
           Consumer<HomeState>(builder: (context, HomeState homeState, child) {
         return MaterialApp(
+
           debugShowCheckedModeBanner: false,
           supportedLocales: const [
             Locale('pt', 'BR'),
@@ -67,15 +74,18 @@ class App extends StatelessWidget {
                   },
                   items: const [
                     BottomNavigationBarItem(
+                        icon: Icon(Icons.schedule), label: "Meu dia"),
+                    BottomNavigationBarItem(
                         icon: Icon(Icons.check_circle), label: "Tarefas"),
                     BottomNavigationBarItem(
                         icon: Icon(Icons.settings), label: "Configurações"),
                   ],
                 ),
                 floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerDocked,
+                    FloatingActionButtonLocation.endFloat,
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
+                    todosState.resetTodo();
                     homeState.openTaskScreen(context);
                   },
                   child: const Icon(Icons.add),
@@ -98,7 +108,7 @@ class App extends StatelessWidget {
                       color: Colors.grey.shade600,
                     ),
                   ),
-                  elevation: 2,
+                  elevation: 0,
                   backgroundColor: Colors.white,
                   actions: getActions(homeState.page, context, todosState),
                 ),

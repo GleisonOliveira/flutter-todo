@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_list/components/grouped_todo_list.dart';
+import 'package:todo_list/components/simple_todo_list.dart';
 import 'package:todo_list/states/todos_state.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+class DayPage extends StatelessWidget {
+  const DayPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
         Flexible(
           fit: FlexFit.tight,
           child: SlidableAutoCloseBehavior(
-            child: GroupedTodoList(
+            child: SimpleTodoList(
               todos: todosState.todos,
             ),
           ),

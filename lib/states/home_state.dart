@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:todo_list/models/home.dart';
+import 'package:todo_list/pages/day_page.dart';
 import 'package:todo_list/pages/home_page.dart';
 import 'package:todo_list/pages/todo_page.dart';
 
 class HomeState extends ChangeNotifier {
   int page = 0;
   PageController pageController = PageController();
-  late SlidableController slidableController;
 
   final List<Home> pages = [
+    Home(page: const DayPage(), appBar: "MEU DIA",),
     Home(page: const HomePage(), appBar: "TODAS AS TAREFAS"),
-    Home(page: Container(), appBar: "Configurações",)
+    Home(page: Container(), appBar: "CONFIGURAÇÕES",)
   ];
 
   void setPage(int index) {
