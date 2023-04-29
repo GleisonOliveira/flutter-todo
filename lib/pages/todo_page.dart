@@ -2,6 +2,7 @@ import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_list/states/settings_state.dart';
 import 'package:todo_list/states/todos_state.dart';
 
 const List<Color> colors = [
@@ -68,6 +69,8 @@ class TodoPage extends StatelessWidget {
     }
 
     Future<void> chooseDate() async {
+      FocusManager.instance.primaryFocus?.unfocus();
+
       DateTime? pickedDate = await showDatePicker(
         initialEntryMode: DatePickerEntryMode.calendarOnly,
         context: context,
@@ -84,12 +87,15 @@ class TodoPage extends StatelessWidget {
     }
 
     Future<void> chooseHour() async {
+      FocusManager.instance.primaryFocus?.unfocus();
+
       Navigator.of(context).push(
         showPicker(
           borderRadius: 5,
           context: context,
           is24HrFormat: true,
           cancelText: "CANCELAR",
+          accentColor: Theme.of(context).primaryColor,
           okText: "OK",
           value: Time(hour: DateTime.now().hour, minute: DateTime.now().minute),
           onChange: (time) {
@@ -106,177 +112,176 @@ class TodoPage extends StatelessWidget {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(
-                  Icons.close,
-                  color: Colors.grey.shade600,
-                ),
-              )
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: todosState.todoInputController,
-                  onChanged: (String text) {
-                    todosState.changeText(text);
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Padding(
+        padding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
-                  style: const TextStyle(fontSize: 14),
-                  decoration: const InputDecoration(
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelText: "Nome da tarefa",
-                    hintText: "Insira uma nova tarefa aqui",
-                    fillColor: Colors.white,
-                    filled: true,
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffebebeb),
-                        width: 1,
+                  icon: Icon(
+                    Icons.close,
+                    color: Colors.grey.shade600,
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: todosState.todoInputController,
+                    onChanged: (String text) {
+                      todosState.changeText(text);
+                    },
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).textTheme.bodySmall?.color),
+                    decoration: InputDecoration(
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelText: "Nome da tarefa",
+                      hintText: "Insira uma nova tarefa aqui",
+                      filled: true,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            Theme.of(context).inputDecorationTheme.outlineBorder!,
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffebebeb),
-                        width: 1,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            Theme.of(context).inputDecorationTheme.outlineBorder!,
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: TextField(
-                  readOnly: true,
-                  controller: todosState.todoDateInputController,
-                  onTap: chooseDate,
-                  style: const TextStyle(fontSize: 14),
-                  decoration: const InputDecoration(
-                    labelText: "Data da tarefa",
-                    fillColor: Colors.white,
-                    filled: true,
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffebebeb),
-                        width: 1,
+              ],
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    readOnly: true,
+                    controller: todosState.todoDateInputController,
+                    onTap: chooseDate,
+                    style: const TextStyle(fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText: "Data da tarefa",
+                      filled: true,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                        Theme.of(context).inputDecorationTheme.outlineBorder!,
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffebebeb),
-                        width: 1,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            Theme.of(context).inputDecorationTheme.outlineBorder!,
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                width: 15,
-              ),
-              Expanded(
-                flex: 2,
-                child: TextField(
-                  readOnly: true,
-                  controller: todosState.todoHourInputController,
-                  onTap: chooseHour,
-                  style: const TextStyle(fontSize: 14),
-                  decoration: const InputDecoration(
-                    labelText: "Hora da tarefa",
-                    fillColor: Colors.white,
-                    filled: true,
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffebebeb),
-                        width: 1,
+                const SizedBox(
+                  width: 15,
+                ),
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    readOnly: true,
+                    controller: todosState.todoHourInputController,
+                    onTap: chooseHour,
+                    style: const TextStyle(fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText: "Hora da tarefa",
+                      filled: true,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            Theme.of(context).inputDecorationTheme.outlineBorder!,
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color(0xffebebeb),
-                        width: 1,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .color!
+                              .withAlpha(50),
+                          width: 1,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Row(
-            children: [
-              Switch(
-                  value: todosState.finished,
-                  onChanged: todosState.changeFinished),
-              Text(todosState.finished
-                  ? "Marcar tarefa como finalizada"
-                  : "Marcar tarefa como não finalizada")
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          const Text("Escolha uma cor:"),
-          const SizedBox(height: 15),
-          BlockPicker(
-            pickerColor: todosState.color,
-            onColorChanged: (Color color) {
-              todosState.changeColor(color);
-            },
-            availableColors: colors,
-            layoutBuilder: pickerLayoutBuilder,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              ElevatedButton(
-                onPressed: todosState.name.isEmpty == true ? null : manageTodo,
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    minimumSize: const Size(120, 40)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      edit ? Icons.refresh : Icons.save,
-                      size: 18,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      edit ? "Atualizar" : "Salvar",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: [
+                Switch(
+                    value: todosState.finished,
+                    onChanged: todosState.changeFinished),
+                Text(todosState.finished
+                    ? "Marcar tarefa como finalizada"
+                    : "Marcar tarefa como não finalizada")
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text("Escolha uma cor:"),
+            const SizedBox(height: 15),
+            BlockPicker(
+              pickerColor: todosState.color,
+              onColorChanged: (Color color) {
+                todosState.changeColor(color);
+              },
+              availableColors: colors,
+              layoutBuilder: pickerLayoutBuilder,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ElevatedButton(
+                  onPressed: todosState.name.isEmpty == true ? null : manageTodo,
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      minimumSize: const Size(120, 40)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        edit ? Icons.refresh : Icons.save,
+                        size: 18,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        edit ? "Atualizar" : "Salvar",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

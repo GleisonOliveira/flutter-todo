@@ -2,15 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_list/extensions/color_scheme.dart';
 import 'package:todo_list/states/home_state.dart';
+import 'package:todo_list/states/settings_state.dart';
 import 'package:todo_list/states/todos_state.dart';
 
-void main() {
-  runApp(const App());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    MultiProvider(providers: [
+      Provider.value(value: await SharedPreferences.getInstance()),
+      ChangeNotifierProvider<TodosState>(
+        create: (_) => TodosState(),
+      ),
+      ChangeNotifierProvider<HomeState>(
+        create: (_) => HomeState(),
+      ),
+      ChangeNotifierProvider<SettingsState>(
+        create: (_) => SettingsState(),
+      ),
+    ], child: const App()),
+  );
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  Brightness? systemTheme;
+
+  @override
+  void initState() {
+    super.initState();
+
+    var window = WidgetsBinding.instance.window;
+    window.onPlatformBrightnessChanged = () {
+      WidgetsBinding.instance.handlePlatformBrightnessChanged();
+
+      var brightness = window.platformBrightness;
+
+      setState(() {
+        systemTheme = brightness;
+      });
+    };
+  }
 
   List<Widget> getActions(
       int pageIndex, BuildContext context, TodosState todosState) {
@@ -27,7 +67,7 @@ class App extends StatelessWidget {
           },
           icon: Icon(
             Icons.delete_forever,
-            color: Colors.grey.shade700,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           )));
     }
     return actions;
@@ -35,37 +75,35 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarBrightness: Brightness.dark,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    HomeState homeState = Provider.of<HomeState>(context);
+    SettingsState settingsState = Provider.of<SettingsState>(context);
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<TodosState>(
-          create: (_) => TodosState(),
-        ),
-        ChangeNotifierProvider<HomeState>(
-          create: (_) => HomeState(),
-        ),
+    return MaterialApp(
+      theme: settingsState.getTheme(context, systemTheme),
+      debugShowCheckedModeBanner: false,
+      supportedLocales: const [
+        Locale('pt', 'BR'),
       ],
-      child:
-          Consumer<HomeState>(builder: (context, HomeState homeState, child) {
-        return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      home: Builder(
+        builder: (BuildContext context) {
+          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+            statusBarColor:
+                Theme.of(context).extension<AppColorScheme>()?.statusBarColor,
+            statusBarBrightness: Theme.of(context)
+                .extension<AppColorScheme>()
+                ?.statusBarBrightness,
+            statusBarIconBrightness: Theme.of(context)
+                .extension<AppColorScheme>()
+                ?.statusBarBrightness,
+          ));
 
-          debugShowCheckedModeBanner: false,
-          supportedLocales: const [
-            Locale('pt', 'BR'),
-          ],
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          home: SafeArea(
-            child: Consumer<TodosState>(
-                builder: (context, TodosState todosState, child) {
+          return SafeArea(
+            child: Consumer<TodosState>(builder: (context, todosState, child) {
               return Scaffold(
                 bottomNavigationBar: BottomNavigationBar(
                   currentIndex: homeState.page,
@@ -93,8 +131,7 @@ class App extends StatelessWidget {
                 appBar: AppBar(
                   title: Text(
                     homeState.pages[homeState.page].appBar.toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
                     ),
@@ -104,15 +141,17 @@ class App extends StatelessWidget {
                       onPressed: () {
                         homeState.setPage(0);
                       },
-                      icon: const Icon(Icons.home),
-                      color: Colors.grey.shade600,
+                      icon: Icon(
+                        Icons.home,
+                        color: Theme.of(context).appBarTheme.foregroundColor,
+                      ),
                     ),
                   ),
-                  elevation: 0,
-                  backgroundColor: Colors.white,
+                  elevation: 1,
+                  backgroundColor:
+                      Theme.of(context).appBarTheme.backgroundColor,
                   actions: getActions(homeState.page, context, todosState),
                 ),
-                backgroundColor: Colors.white,
                 body: PageView(
                   physics: const NeverScrollableScrollPhysics(),
                   controller: homeState.pageController,
@@ -120,9 +159,9 @@ class App extends StatelessWidget {
                 ),
               );
             }),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

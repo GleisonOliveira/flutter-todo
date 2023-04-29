@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:grouped_list/grouped_list.dart';
 import 'package:todo_list/components/empty.dart';
 import 'package:todo_list/components/todo_list_item.dart';
-import 'package:todo_list/models/date_formatter.dart';
+import 'package:todo_list/extensions/color_scheme.dart';
 import 'package:todo_list/models/todo.dart';
 
 class SimpleTodoList extends StatelessWidget {
@@ -19,7 +17,7 @@ class SimpleTodoList extends StatelessWidget {
             children: [
               Container(
                 width: double.infinity,
-                color: const Color(0xffF7F7F7),
+                color: Theme.of(context).extension<AppColorScheme>()?.groupBackgroundColor,
                 child: const Padding(
                   padding: EdgeInsets.all(15),
                   child: Text(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:todo_list/components/empty.dart';
 import 'package:todo_list/components/todo_list_item.dart';
+import 'package:todo_list/extensions/color_scheme.dart';
 import 'package:todo_list/models/date_formatter.dart';
 import 'package:todo_list/models/todo.dart';
 
@@ -29,14 +29,19 @@ class GroupedTodoList extends StatelessWidget {
       useStickyGroupSeparators: true,
       floatingHeader: false,
       shrinkWrap: false,
-      groupSeparatorBuilder: (value) => Row(
+      groupSeparatorBuilder: (value) => Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: Text(
-              DateFormatter().formatInDays(value),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          Container(
+            width: double.infinity,
+            color: Theme.of(context).extension<AppColorScheme>()?.groupBackgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Text(
+                DateFormatter().formatInDays(value),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ],
