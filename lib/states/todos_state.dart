@@ -8,65 +8,59 @@ const localeName = "pt_BR";
 class TodosState extends ChangeNotifier {
   List<Todo> todos = [];
   final TodoRepository repository = TodoRepository();
-  String name = "";
-  DateTime date = DateTime.now();
-  Color color = Colors.blue;
-  bool finished = false;
+  Todo todo = Todo();
   TextEditingController todoInputController = TextEditingController();
   TextEditingController todoDateInputController = TextEditingController();
   TextEditingController todoHourInputController = TextEditingController();
-  Todo? todo;
   int todoIndex = 0;
 
   TodosState() {
-    formatDate();
-    formatHour();
     getTodos();
   }
 
   void resetTodo() {
     todoInputController.text = "";
-    name = "";
-    color = Colors.blue;
+    todo.name = "";
+    todo.color = Colors.blue;
+    todo.notes = null;
     DateTime now = DateTime.now();
-    date = DateTime(now.year, now.month, now.day, 0, 0);
+    todo.date = DateTime(now.year, now.month, now.day, 0, 0);
 
     formatDate();
     formatHour();
 
-    todo = null;
+    notifyListeners();
   }
 
   void sortList() {
     todos.sort((a, b) {
-      return a.date.compareTo(b.date);
+      return a.date!.compareTo(b.date!);
     });
   }
 
   void addTodo() {
-    todos.add(Todo(todoInputController.text.trim(), date,
-        color: color, finished: finished));
+    todos.add(todo.copyWith());
     sortList();
 
     repository.save(todos);
-
-    resetTodo();
 
     notifyListeners();
   }
 
   void updateTodo() {
     Todo todo = todos[todoIndex];
-    todo.color = color;
-    todo.date = date;
-    todo.finished = finished;
-    todo.name = name;
+
+    todo.color = this.todo.color;
+    todo.date = this.todo.date;
+    todo.finished = this.todo.finished;
+    todo.name = this.todo.name;
+    todo.notes = this.todo.notes;
+
+    todos[todoIndex] = todo;
 
     sortList();
 
     repository.save(todos);
-
-    resetTodo();
 
     notifyListeners();
   }
@@ -195,7 +189,7 @@ class TodosState extends ChangeNotifier {
   }
 
   void changeDate(DateTime date) {
-    this.date = date;
+    todo.date = date;
 
     formatDate();
     formatHour();
@@ -205,46 +199,43 @@ class TodosState extends ChangeNotifier {
 
   void formatDate() {
     DateFormatter()
-        .format(locale: localeName, format: "E - dd/MM/yyyy", dateTime: date)
+        .format(locale: localeName, format: "E - dd/MM/yyyy", dateTime: todo.date!)
         .then(
             (formattedValue) => todoDateInputController.text = formattedValue);
   }
 
   void formatHour() {
     DateFormatter()
-        .format(locale: localeName, format: "HH:mm", dateTime: date)
+        .format(locale: localeName, format: "HH:mm", dateTime: todo.date!)
         .then(
             (formattedValue) => todoHourInputController.text = formattedValue);
   }
 
   void changeText(String text) {
-    name = text;
+    todo.name = text;
 
     notifyListeners();
   }
 
   void changeColor(Color color) {
-    this.color = color;
+    todo.color = color;
 
     notifyListeners();
   }
 
   void changeFinished(bool finished) {
-    this.finished = finished;
+    todo.finished = finished;
 
     notifyListeners();
   }
 
   void changeTodo(Todo todo) {
-    this.todo = todo;
-    name = todo.name;
-    color = todo.color;
-    finished = todo.finished;
-    date = todo.date;
+    this.todo = todo.copyWith();
 
     formatHour();
     formatDate();
-    todoInputController.text = todo.name;
+
+    todoInputController.text = todo.name!;
 
     todoIndex = todos.indexOf(todo);
 

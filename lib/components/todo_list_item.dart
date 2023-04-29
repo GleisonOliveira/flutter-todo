@@ -27,7 +27,7 @@ class _TodoListItemState extends State<TodoListItem> {
         .format(
             locale: "pt_BR",
             format: "E - dd/MM/yyyy - HH:mm",
-            dateTime: widget.todo.date)
+            dateTime: widget.todo.date!)
         .then((formattedDate) {
       setState(() {
         date = formattedDate;
@@ -39,18 +39,16 @@ class _TodoListItemState extends State<TodoListItem> {
   void didUpdateWidget(TodoListItem oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.todo.date != widget.todo.date) {
-      DateFormatter()
-          .format(
-              locale: "pt_BR",
-              format: "E - dd/MM/yyyy - HH:mm",
-              dateTime: widget.todo.date)
-          .then((formattedDate) {
-        setState(() {
-          date = formattedDate;
-        });
+    DateFormatter()
+        .format(
+            locale: "pt_BR",
+            format: "E - dd/MM/yyyy - HH:mm",
+            dateTime: widget.todo.date!)
+        .then((formattedDate) {
+      setState(() {
+        date = formattedDate;
       });
-    }
+    });
   }
 
   @override
@@ -133,7 +131,7 @@ class _TodoListItemState extends State<TodoListItem> {
           child: Material(
             color: Theme.of(context).scaffoldBackgroundColor,
             child: InkWell(
-              onTap: (){
+              onTap: () {
                 todosState.changeTodo(widget.todo);
                 homeState.openTaskScreen(context, edit: true);
               },
@@ -151,9 +149,8 @@ class _TodoListItemState extends State<TodoListItem> {
                           TextButton(
                             onPressed: () {
                               Slidable.of(context)?.dismiss(
-                                ResizeRequest(const Duration(milliseconds: 300), (){
-
-                                }),
+                                ResizeRequest(
+                                    const Duration(milliseconds: 300), () {}),
                                 duration: const Duration(milliseconds: 300),
                               );
 
@@ -203,7 +200,7 @@ class _TodoListItemState extends State<TodoListItem> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                   Icon(
+                                Icon(
                                   Icons.calendar_month,
                                   color: Theme.of(context).primaryColor,
                                   size: 20,
@@ -214,7 +211,10 @@ class _TodoListItemState extends State<TodoListItem> {
                                 Text(
                                   date,
                                   style: TextStyle(
-                                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.color,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -228,11 +228,14 @@ class _TodoListItemState extends State<TodoListItem> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    widget.todo.name,
+                                    widget.todo.name!,
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      color: Theme.of(context).textTheme.bodySmall?.color,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,
                                     ),

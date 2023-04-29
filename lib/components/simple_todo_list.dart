@@ -31,7 +31,7 @@ class SimpleTodoList extends StatelessWidget {
                 children: todos
                     .where((todo) {
                       var now = DateTime.now();
-                      var todoDate = todo.date;
+                      var todoDate = todo.date!;
                       return now.year == todoDate.year &&
                           now.month == todoDate.month &&
                           now.day == todoDate.day;
