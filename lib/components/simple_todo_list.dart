@@ -10,14 +10,22 @@ class SimpleTodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return todos.isEmpty
+    return todos.where((todo) {
+      var now = DateTime.now();
+      var todoDate = todo.date!;
+      return now.year == todoDate.year &&
+          now.month == todoDate.month &&
+          now.day == todoDate.day;
+    }).isEmpty
         ? const Empty()
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: double.infinity,
-                color: Theme.of(context).extension<AppColorScheme>()?.groupBackgroundColor,
+                color: Theme.of(context)
+                    .extension<AppColorScheme>()
+                    ?.groupBackgroundColor,
                 child: const Padding(
                   padding: EdgeInsets.all(15),
                   child: Text(

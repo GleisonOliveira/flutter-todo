@@ -12,6 +12,7 @@ class TodosState extends ChangeNotifier {
   TextEditingController todoInputController = TextEditingController();
   TextEditingController todoDateInputController = TextEditingController();
   TextEditingController todoHourInputController = TextEditingController();
+  TextEditingController notesInputController = TextEditingController();
   int todoIndex = 0;
 
   TodosState() {
@@ -22,7 +23,7 @@ class TodosState extends ChangeNotifier {
     todoInputController.text = "";
     todo.name = "";
     todo.color = Colors.blue;
-    todo.notes = null;
+    todo.notes = "";
     DateTime now = DateTime.now();
     todo.date = DateTime(now.year, now.month, now.day, 0, 0);
 
@@ -217,6 +218,12 @@ class TodosState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void changeNotes(String text) {
+    todo.notes = text;
+
+    notifyListeners();
+  }
+
   void changeColor(Color color) {
     todo.color = color;
 
@@ -236,6 +243,7 @@ class TodosState extends ChangeNotifier {
     formatDate();
 
     todoInputController.text = todo.name!;
+    notesInputController.text = todo.notes ?? "";
 
     todoIndex = todos.indexOf(todo);
 

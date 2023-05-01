@@ -62,6 +62,7 @@ class _AppState extends State<App> {
 
     if (todosState.todos.isNotEmpty) {
       actions.add(IconButton(
+          splashRadius: 20,
           onPressed: () {
             todosState.clearTodos(context);
           },
@@ -89,79 +90,81 @@ class _AppState extends State<App> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: Builder(
-        builder: (BuildContext context) {
-          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarColor:
-                Theme.of(context).extension<AppColorScheme>()?.statusBarColor,
-            statusBarBrightness: Theme.of(context)
-                .extension<AppColorScheme>()
-                ?.statusBarBrightness,
-            statusBarIconBrightness: Theme.of(context)
-                .extension<AppColorScheme>()
-                ?.statusBarBrightness,
-          ));
+      home: Builder(builder: (BuildContext context) {
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          statusBarColor:
+          Theme.of(context).extension<AppColorScheme>()?.statusBarColor,
+          statusBarBrightness: Theme.of(context)
+              .extension<AppColorScheme>()
+              ?.statusBarBrightness,
+          statusBarIconBrightness: Theme.of(context)
+              .extension<AppColorScheme>()
+              ?.statusBarBrightness,
+        ));
+        return SafeArea(
+          child: Consumer<TodosState>(builder: (context, todosState, child) {
+            return Scaffold(
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: homeState.page,
+                onTap: (int index) {
+                  if(index == homeState.page) {
+                    return ;
+                  }
 
-          return SafeArea(
-            child: Consumer<TodosState>(builder: (context, todosState, child) {
-              return Scaffold(
-                bottomNavigationBar: BottomNavigationBar(
-                  currentIndex: homeState.page,
-                  onTap: (int index) {
-                    homeState.setPage(index);
-                  },
-                  items: const [
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.schedule), label: "Meu dia"),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.check_circle), label: "Tarefas"),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.settings), label: "Configurações"),
-                  ],
+                  homeState.setPage(index);
+                },
+                items: const [
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.schedule), label: "Meu dia"),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.check_circle), label: "Tarefas"),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.settings), label: "Configurações"),
+                ],
+              ),
+              floatingActionButtonLocation:
+              FloatingActionButtonLocation.endFloat,
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  todosState.resetTodo();
+                  homeState.openTaskScreen(context);
+                },
+                child: const Icon(Icons.add),
+              ),
+              appBar: AppBar(
+                title: Text(
+                  homeState.pages[homeState.page].appBar.toUpperCase(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                  ),
                 ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.endFloat,
-                floatingActionButton: FloatingActionButton(
-                  onPressed: () {
-                    todosState.resetTodo();
-                    homeState.openTaskScreen(context);
-                  },
-                  child: const Icon(Icons.add),
-                ),
-                appBar: AppBar(
-                  title: Text(
-                    homeState.pages[homeState.page].appBar.toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
+                leading: Builder(
+                  builder: (context) => IconButton(
+                    splashRadius: 20,
+                    onPressed: () {
+                      homeState.setPage(0);
+                    },
+                    icon: Icon(
+                      Icons.home,
+                      color: Theme.of(context).appBarTheme.foregroundColor,
                     ),
                   ),
-                  leading: Builder(
-                    builder: (context) => IconButton(
-                      onPressed: () {
-                        homeState.setPage(0);
-                      },
-                      icon: Icon(
-                        Icons.home,
-                        color: Theme.of(context).appBarTheme.foregroundColor,
-                      ),
-                    ),
-                  ),
-                  elevation: 1,
-                  backgroundColor:
-                      Theme.of(context).appBarTheme.backgroundColor,
-                  actions: getActions(homeState.page, context, todosState),
                 ),
-                body: PageView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  controller: homeState.pageController,
-                  children: homeState.pages.map((e) => e.page).toList(),
-                ),
-              );
-            }),
-          );
-        },
-      ),
+                elevation: 1,
+                backgroundColor:
+                Theme.of(context).appBarTheme.backgroundColor,
+                actions: getActions(homeState.page, context, todosState),
+              ),
+              body: PageView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: homeState.pageController,
+                children: homeState.pages.map((e) => e.page).toList(),
+              ),
+            );
+          }),
+        );
+      },)
     );
   }
 }

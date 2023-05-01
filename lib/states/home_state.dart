@@ -59,7 +59,7 @@ class HomeState extends ChangeNotifier {
       barrierColor: Colors.black.withAlpha(200),
       context: context,
       useRootNavigator: false,
-      builder: (context) =>TodoPage(edit: edit),
+      builder: (context) => TodoPage(edit: edit),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
       ),
