@@ -18,22 +18,10 @@ class Notes extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                margin: EdgeInsets.zero,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade500,
-                      spreadRadius: 0,
-                      blurRadius: 1,
-                      blurStyle: BlurStyle.outer,
-                      offset:
-                          const Offset(0, 1), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: Material(
+              Material(
+                color:  Theme.of(context).scaffoldBackgroundColor,
+                child: Container(
+                  margin: EdgeInsets.zero,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -54,7 +42,19 @@ class Notes extends StatelessWidget {
                 ),
               ),
               Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      spreadRadius: 2,
+                      blurRadius: 2,
+                      blurStyle: BlurStyle.inner,
+                      offset:
+                      Offset(0, 1), // changes position of shadow
+                    ),
+                  ],
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,

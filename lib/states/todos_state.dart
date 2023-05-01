@@ -9,6 +9,8 @@ class TodosState extends ChangeNotifier {
   List<Todo> todos = [];
   final TodoRepository repository = TodoRepository();
   Todo todo = Todo();
+  String date = "";
+  String hour = "";
   TextEditingController todoInputController = TextEditingController();
   TextEditingController todoDateInputController = TextEditingController();
   TextEditingController todoHourInputController = TextEditingController();
@@ -202,14 +204,14 @@ class TodosState extends ChangeNotifier {
     DateFormatter()
         .format(locale: localeName, format: "E - dd/MM/yyyy", dateTime: todo.date!)
         .then(
-            (formattedValue) => todoDateInputController.text = formattedValue);
+            (formattedValue) => date  = formattedValue);
   }
 
   void formatHour() {
     DateFormatter()
         .format(locale: localeName, format: "HH:mm", dateTime: todo.date!)
         .then(
-            (formattedValue) => todoHourInputController.text = formattedValue);
+            (formattedValue) => hour = formattedValue);
   }
 
   void changeText(String text) {
