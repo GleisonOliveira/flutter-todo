@@ -61,7 +61,7 @@ class Notes extends StatelessWidget {
                     vertical: 5,
                   ),
                   child: TextField(
-                    maxLines: 6,
+                    maxLines: 4,
                     controller: todosState.notesInputController,
                     autofocus: true,
                     decoration: const InputDecoration(

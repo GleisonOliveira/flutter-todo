@@ -41,16 +41,22 @@ class TodosState extends ChangeNotifier {
     });
   }
 
-  void addTodo() {
+  void addTodo(BuildContext context) {
     todos.add(todo.copyWith());
     sortList();
 
     repository.save(todos);
 
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("A tarefa '${todo.name}' foi adicionada."),
+      ),
+    );
+
     notifyListeners();
   }
 
-  void updateTodo() {
+  void updateTodo(BuildContext context) {
     Todo todo = todos[todoIndex];
 
     todo.color = this.todo.color;
@@ -64,6 +70,12 @@ class TodosState extends ChangeNotifier {
     sortList();
 
     repository.save(todos);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("A tarefa '${todo.name}' foi atualizada."),
+      ),
+    );
 
     notifyListeners();
   }
@@ -202,16 +214,15 @@ class TodosState extends ChangeNotifier {
 
   void formatDate() {
     DateFormatter()
-        .format(locale: localeName, format: "E - dd/MM/yyyy", dateTime: todo.date!)
-        .then(
-            (formattedValue) => date  = formattedValue);
+        .format(
+            locale: localeName, format: "E - dd/MM/yyyy", dateTime: todo.date!)
+        .then((formattedValue) => date = formattedValue);
   }
 
   void formatHour() {
     DateFormatter()
         .format(locale: localeName, format: "HH:mm", dateTime: todo.date!)
-        .then(
-            (formattedValue) => hour = formattedValue);
+        .then((formattedValue) => hour = formattedValue);
   }
 
   void changeText(String text) {

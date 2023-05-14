@@ -41,9 +41,9 @@ class TodoPage extends StatelessWidget {
 
       return SizedBox(
         width: screen.width,
-        height: 100,
+        height: (MediaQuery.of(context).size.height / (MediaQuery.of(context).size.width / 90).ceil()),
         child: GridView.count(
-          crossAxisCount: 8,
+          crossAxisCount: (MediaQuery.of(context).size.width / 60).ceil(),
           crossAxisSpacing: 6,
           mainAxisSpacing: 6,
           children: [for (Color color in colors) child(color)],
@@ -55,14 +55,14 @@ class TodoPage extends StatelessWidget {
       FocusManager.instance.primaryFocus?.unfocus();
 
       if (edit) {
-        todosState.updateTodo();
+        todosState.updateTodo(context);
 
         Navigator.of(context).pop();
 
         return;
       }
 
-      todosState.addTodo();
+      todosState.addTodo(context);
 
       Navigator.of(context).pop();
     }
@@ -161,10 +161,12 @@ class TodoPage extends StatelessWidget {
               ],
             ),
           ),
-          Expanded(
+          Flexible(
+            fit: FlexFit.loose,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
